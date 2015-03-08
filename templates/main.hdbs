@@ -1,0 +1,39 @@
+<div id="server_status">
+	<h4>Server Status</h4>
+	<div id="s1_status" class="alert alert-block">
+		
+		<h4><button class="btn btn-info btn_refresh"><i class="icon-refresh"></i></button> S1</h4>
+		<span id="ftpd_s1">FTP</span>
+		 <span id="httpd_s1">HTTP</span>
+		 <span id="mysql_s1">MYSQL</span>
+		 <span id="pop_s1">POP3</span>
+		 <span id="exim_s1">EXIM</span>
+		 <span id="imap_s1">IMAP</span>
+	</div>
+</div>
+<select id="server">
+	<option value="all">All</option>
+	<option value="s1">S1</option>
+	<option value="s2">S2</option>
+</select>
+<div id="finder">
+	<input id="cpanel" placeholder="cPanel Username" name="cpanel" type="text"/>
+	<button id="search_cpanel" class="btn">
+		<i class="icon-search"></i>
+	</button>
+	<div id="account_details" class="alert alert-info">
+		<ul id="user_data" class="user_data">
+
+		</ul>
+		<div id="user_actions">
+		<button id="suspend" class="btn btn-alert" style="display:none;">Suspend</button> 
+		<button id="unsuspend" class="btn btn-success" style="display:none;">Unsuspend</button>
+		</div>
+	</div>
+</div>
+
+<button class="btn" id="whitelist">Whitelist</button>
+<button class="btn" id="blacklist">Blacklist</button>
+<button class="btn" id="restart_fw">Restart Firewall</button>
+<h4>Logs</h4>
+<div class="well" id="logs"></div>

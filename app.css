@@ -1,0 +1,28 @@
+#server{
+	width:100%;
+}
+#cpanel{
+	width:80%;
+}
+#search_cpanel{
+	float:right;
+}
+.user_data{
+	margin-left:0;
+}
+button.btn_refresh{
+	padding: 0;
+	cursor: pointer;
+	background-color: transparent;
+	border: 0;
+	-webkit-appearance: none;
+}
+.btn_refresh{
+	font-size: 20px;
+	font-weight: bold;
+	line-height: 18px;
+	color: #000;
+	text-shadow: 0 1px 0 #fff;
+	opacity: 0.2;
+
+}
