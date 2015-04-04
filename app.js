@@ -2,26 +2,12 @@
 
 
 
-  var SECRET_ACCESS_TOKEN = "BetterChangeMeNowOrSufferTheConsequences";
   var WHM_API_HASH = "HIDDENMUAHAHAHA";
   var services = ["ftpd","httpd","mysql","pop","exim","imap"];
   var ticket;
-  var subject;
-  var ms= /\b\d{1,3}\.\d{1,3}\.\d{1,3}\.\d{1,3}\b/;
-  var ip;
 
   return {
     requests:{
-      servContact: function(ip,action){
-        return {
-          url: 'https://s2.netizate.com/iphandle.php',
-          type: 'POST',
-          data: {"action":action,
-                 "ip":ip,
-                 "sat": SECRET_ACCESS_TOKEN
-                },
-        };
-      },
       getUserData: function(cpanel){
         return{
           url: 'https://s2.netizate.com:2087/json-api/accountsummary?api.version=1&user='+cpanel,
@@ -57,9 +43,6 @@
     },
     events: {
       'app.activated':'doSomething',
-      'click #blacklist':'addBlackListIP',
-      'click #whitelist':'addWhiteListIP',
-      'click #restart_fw':'restartFirewall',
       'click #search_cpanel':'doManualSearchAccount',
       'click #suspend':'doSuspendVerify',
       'click .btn_refresh':'doCheckServiceStatus'
@@ -68,7 +51,6 @@
     doSomething: function() {
       ticket = this.ticket();
       subject = ticket.subject();
-      ip= subject.match(ms);
       this.switchTo('main'); 
       var cPanel = ticket.customField('custom_field_24103102');
       this.doSearchAccount(cPanel);
@@ -143,35 +125,6 @@
         }
         }
       });
-    },
-    addBlackListIP: function(){
-       
-       console.log(subject);
-       var ip = subject.match(ms);
-       this.ticket().customField("custom_field_25681372", ip[0]);
-       this.doCleanLogs();
-       this.doAddLogs("Blacklisting IP "+ ip[0]);
-       var request = this.ajax('servContact',ip[0],'blacklist').done(function(data) {
-          console.log(data);
-            this.doAddLogs(data);
-         });
-    },
-    addWhiteListIP: function(){
-       var ip = subject.match(ms);
-       this.doCleanLogs();
-       this.doAddLogs("Whitelisting IP "+ ip[0]);
-       this.ticket().customField("custom_field_25664101", ip[0]);
-       var request = this.ajax('servContact',ip[0],'whitelist').done(function(data) {
-            this.doAddLogs(data);
-            this.doAddLogs("IP "+ip[0]+" Successfully whitelisted.");
-         });
-    },
-    restartFirewall: function(){
-
-      this.doAddLogs("Restarting the Firewall");
-      var request = this.ajax('servContact',0,'restart').done(function(data) {
-            this.doAddLogs("CSF + LFD Restarted");
-         });
     },
     doAddLogs: function(text){
       this.$('#logs').append("<p>"+text+"</p>");

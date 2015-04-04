@@ -31,9 +31,5 @@
 		</div>
 	</div>
 </div>
-
-<button class="btn" id="whitelist">Whitelist</button>
-<button class="btn" id="blacklist">Blacklist</button>
-<button class="btn" id="restart_fw">Restart Firewall</button>
 <h4>Logs</h4>
 <div class="well" id="logs"></div>
