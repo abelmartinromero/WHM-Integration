@@ -1,8 +1,5 @@
 (function() {
 
-
-
-  var WHM_API_HASH = "HIDDENMUAHAHAHA";
   var services = ["ftpd","httpd","mysql","pop","exim","imap"];
   var ticket;
 
@@ -10,11 +7,9 @@
     requests:{
       getUserData: function(cpanel){
         return{
-          url: 'https://s2.netizate.com:2087/json-api/accountsummary?api.version=1&user='+cpanel,
-          
-          beforeSend: function(data) {
-            //Authorization: WHM $whmusername:" . preg_replace("'(\r|\n)'","",$hash
-            data.setRequestHeader("Authorization", "WHM root:" + WHM_API_HASH);
+          url: 'https://'+this.setting('server_domain')+':2087/json-api/accountsummary?api.version=1&user='+cpanel,
+          headers: {
+            'Authorization': 'WHM '+this.setting('server_username')+':'+this.setting('server_hash')
           },
           type: 'GET'
 
@@ -22,20 +17,18 @@
       },
       checkServiceStatus: function(){
         return{
-          url: 'https://s2.netizate.com:2087/json-api/servicestatus?api.version=1',
-          beforeSend: function(data) {
-            //Authorization: WHM $whmusername:" . preg_replace("'(\r|\n)'","",$hash
-            data.setRequestHeader("Authorization", "WHM root:" + WHM_API_HASH);
+          url: 'https://'+this.setting('server_domain')+':2087/json-api/servicestatus?api.version=1',
+          headers: {
+            'Authorization': 'WHM '+this.setting('server_username')+':'+this.setting('server_hash')
           },
           type: 'GET'
         };
       },
       suspendAccount: function(user,reason){
         return{
-        url: 'https://s2.netizate.com:2087/json-api/suspendacct?api.version=1&user='+user+'&reason='+reason,
-          beforeSend: function(data) {
-            //Authorization: WHM $whmusername:" . preg_replace("'(\r|\n)'","",$hash
-            data.setRequestHeader("Authorization", "WHM root:" + WHM_API_HASH);
+        url: 'https://'+this.setting('server_domain')+':2087/json-api/suspendacct?api.version=1&user='+user+'&reason='+reason,
+          headers: {
+            'Authorization': 'WHM '+this.setting('server_username')+':'+this.setting('server_hash')
           },
           type: 'GET'
         };
@@ -50,23 +43,23 @@
 
     doSomething: function() {
       ticket = this.ticket();
-      subject = ticket.subject();
       this.switchTo('main'); 
       var cPanel = ticket.customField('custom_field_24103102');
-      this.doSearchAccount(cPanel);
+      //this.doSearchAccount(cPanel);
       
       this.doCheckServiceStatus();
       
     },
     doCheckServiceStatus:function(){
+  //TODO - Load settings and detect selected server 
      var request = this.ajax('checkServiceStatus').done(function(result){
-      data = JSON.parse(result);
-      v_icon_check = '<i class="icon-white icon-ok"></i>';
-      v_icon_fail = '<i class="icon-repeat"></i>';
+      var data = JSON.parse(result);
+      var v_icon_check = '<i class="icon-white icon-ok"></i>';
+      var v_icon_fail = '<i class="icon-repeat"></i>';
       
       console.log(result);
       _.each(services,function(service){
-        var v_service = _.find(data.data.service, function(aux_s){return aux_s.name == service});
+        var v_service = _.find(data.data.service, function(aux_s){return aux_s.name == service;});
         if(v_service.monitored != 1){
         this.$('#logs').append("<p>Service " + service + " is not monitored. Please make sure it's being monitored if you want to check it's status</p>");
         }else{
@@ -89,7 +82,7 @@
     },
     doManualSearchAccount: function(){
       var cPanel = this.$('#cpanel').val();
-      if(cPanel != "" && cPanel){
+      if(cPanel !== "" && cPanel){
         this.doSearchAccount(cPanel);
       }
     },
@@ -97,6 +90,7 @@
       this.$('#suspend').hide();
       this.$('#unsuspend').hide();
       this.$('#user_data').empty();
+      this.$('#user_data').show();
       this.$('#user_data').append('<div class="spinner dotted"></div>');
       var tst = this.ajax('getUserData',cPanel);
 
@@ -118,7 +112,7 @@
         //this.$('#account_details').append('<button id="suspend" class="btn btn-alert">Suspend</button>');
         this.$('#unsuspend').hide();
         this.$('#suspend').show();
-        if(v_data.data.acct[0].suspended != 0){
+        if(v_data.data.acct[0].suspended !== 0){
           //this.$('#account_details').append('<button id="unsuspend" class="btn btn-success">Unsuspend</button>');
           this.$('#suspend').hide();
           this.$('#unsuspend').show();
