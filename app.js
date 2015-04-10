@@ -24,6 +24,15 @@
           type: 'GET'
         };
       },
+      restartService: function(service){
+        return{
+          url: 'https://'+this.setting('server_domain')+':2087/json-api/restartservice?api.version=1&service='+service,
+          headers: {
+            'Authorization': 'WHM '+this.setting('server_username')+':'+this.setting('server_hash')
+          },
+          type: 'GET'
+        };
+      },
       suspendAccount: function(user,reason){
         return{
         url: 'https://'+this.setting('server_domain')+':2087/json-api/suspendacct?api.version=1&user='+user+'&reason='+reason,
@@ -38,39 +47,71 @@
       'app.activated':'doSomething',
       'click #search_cpanel':'doManualSearchAccount',
       'click #suspend':'doSuspendVerify',
-      'click .btn_refresh':'doCheckServiceStatus'
+      'click .btn_refresh':'doCheckServiceStatus',
+      'click .restart_service':'doRestartService',
+      'click #toggle_status': 'doToggleDropDown'
     },
-
+    doToggleDropDown: function(e){
+      console.log(this.$('#caret_server'));
+      switch(this.$('#caret_server')[0].className)
+      {
+        case "caret caret-reversed":
+          this.$('#caret_server').attr('class','caret');
+          this.$('#status_list').hide();
+        break;
+        case "caret":
+          this.$('#caret_server').attr('class','caret caret-reversed');
+          this.$('#status_list').show();
+          this.doCheckServiceStatus();
+        break;
+      }
+    },
     doSomething: function() {
       ticket = this.ticket();
       this.switchTo('main'); 
       var cPanel = ticket.customField('custom_field_24103102');
-      //this.doSearchAccount(cPanel);
+      this.doSearchAccount(cPanel);
       
       this.doCheckServiceStatus();
       
     },
+    doRestartService:function(e){
+      this.doCleanLogs();
+      var service = e.target.parentNode.id;
+      this.doAddLogs("Restarting service " + service);
+      this.ajax('restartService',service).done(function(result){
+        var data = JSON.parse(result);
+        this.doAddLogs(data.metadata.output.raw);
+      });
+      this.doCheckServiceStatus();
+    },
     doCheckServiceStatus:function(){
-  //TODO - Load settings and detect selected server 
-     var request = this.ajax('checkServiceStatus').done(function(result){
+      this.$('#status_list').empty();
+      this.$('#status_list').append('<div class="spinner dotted"></div>');
+
+      var request = this.ajax('checkServiceStatus').done(function(result){
+      this.$('#status_list').empty();  
       var data = JSON.parse(result);
-      var v_icon_check = '<i class="icon-white icon-ok"></i>';
-      var v_icon_fail = '<i class="icon-repeat"></i>';
+      var v_icon_check = '<i class="icon-white icon-ok "></i>';
+      var v_icon_fail = '<i class="icon-repeat restart_service"></i>';
       
-      console.log(result);
+      var service_list = "";
       _.each(services,function(service){
         var v_service = _.find(data.data.service, function(aux_s){return aux_s.name == service;});
         if(v_service.monitored != 1){
         this.$('#logs').append("<p>Service " + service + " is not monitored. Please make sure it's being monitored if you want to check it's status</p>");
         }else{
           if(v_service.running == 1){
-            this.$('#'+service+'_s1').attr("class","label label-success");
+            service_list+=('<tr class="success"><td class="service">'+service+'</td><td>Online</td><td><span class="label label-danger">Stop</span> <span class="label label-warning">Restart</span></td></tr>');
+            //Success
           }else{
-            this.$('#'+service+'_s1').attr("class","label label-important");
-            this.$('#'+service+'_s1').append(v_icon_fail);
+            //Fail3
+            service_list+=('<tr class="danger"><td class="service">'+service+'</td><td>Offline</td><td><span class="label label-success">Start</span></td></tr>');
           }
       }
+      
       });
+      this.$('#status_list').append(service_list);
      }); 
     },
     doSuspendVerify: function(){

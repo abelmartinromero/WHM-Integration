@@ -1,14 +1,21 @@
 <div id="server_status">
-	<h4>Server Status</h4>
-	<div id="s1_status" class="alert alert-block">
-		<h4><button class="btn btn-info btn_refresh"><i class="icon-refresh"></i></button> S1</h4>
-		<span id="ftpd_s1">FTP</span>
-		 <span id="httpd_s1">HTTP</span>
-		 <span id="mysql_s1">MYSQL</span>
-		 <span id="pop_s1">POP3</span>
-		 <span id="exim_s1">EXIM</span>
-		 <span id="imap_s1">IMAP</span>
-	</div>
+	<div class="panel panel-default">
+		<a id="toggle_status" data-toggle="collapse" data-parent="#accordion" href="#collapseOne" aria-expanded="true" aria-controls="collapseOne" >
+	    <div class="panel-heading" role="tab" id="headingOne">
+	      <h4> Server Status
+	          <span id="caret_server" class="caret"></span>
+	      </h4>
+	    </div>
+	    </a>
+	    <div id="collapseOne" class="panel-collapse collapse in" role="tabpanel" aria-labelledby="headingOne">
+	      <div class="panel-body">
+	        <table id ="status_list" class="table table-condensed" style="display:none;">
+
+			</table>
+	      </div>
+	    </div>
+	  </div>
+</div>
 </div>
 <h4>{{setting.server_name}}</h4>
 <div id="finder">
@@ -24,6 +31,11 @@
 		<button id="suspend" class="btn btn-alert" style="display:none;">Suspend</button> 
 		<button id="unsuspend" class="btn btn-success" style="display:none;">Unsuspend</button>
 		</div>
+	</div>
+	<div id="cpanel_functions">
+		<button class="btn btn-success">Create</button>
+		<button class="btn btn-info">Link</button>
+		<button class="btn btn-warning">Unlink</button>
 	</div>
 </div>
 <h4>Logs</h4>
