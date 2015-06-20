@@ -1,0 +1,8 @@
+{
+  "ticket_fields": {
+    "cpanel_account": {
+      "type": "text",
+      "title": "cPanel Account"
+    }
+  }
+}

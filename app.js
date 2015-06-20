@@ -7,41 +7,45 @@
     requests:{
       getUserData: function(cpanel){
         return{
-          url: 'https://'+this.setting('server_domain')+':2087/json-api/accountsummary?api.version=1&user='+cpanel,
+          url: "https://{{setting.server_domain}}:2087/json-api/accountsummary?api.version=1&user="+cpanel,
           headers: {
-            'Authorization': 'WHM '+this.setting('server_username')+':'+this.setting('server_hash')
+            'Authorization': "WHM {{setting.server_username}}:{{setting.server_hash}}"
           },
-          type: 'GET'
+          type: 'GET',
+          secure:true
 
         };
       },
       checkServiceStatus: function(){
         return{
-          url: 'https://'+this.setting('server_domain')+':2087/json-api/servicestatus?api.version=1',
+          url: 'https://{{setting.server_domain}}:2087/json-api/servicestatus?api.version=1',
           headers: {
-            'Authorization': 'WHM '+this.setting('server_username')+':'+this.setting('server_hash')
+            'Authorization': 'WHM {{setting.server_username}}:{{setting.server_hash}}'
           },
-          type: 'GET'
+          type: 'GET',
+          secure:true
         };
       },
       restartService: function(service){
         return{
-          url: 'https://'+this.setting('server_domain')+':2087/json-api/restartservice?api.version=1&service='+service,
+          url: 'https://{{setting.server_domain}}:2087/json-api/restartservice?api.version=1&service='+service,
           headers: {
-            'Authorization': 'WHM '+this.setting('server_username')+':'+this.setting('server_hash')
+            'Authorization': 'WHM {{setting.server_username}}:{{setting.server_hash}}'
           },
-          type: 'GET'
+          type: 'GET',
+          secure:true
         };
       },
       suspendAccount: function(user,reason){
         return{
-        url: 'https://'+this.setting('server_domain')+':2087/json-api/suspendacct?api.version=1&user='+user+'&reason='+reason,
+        url: 'https://{{setting.server_domain}}::2087/json-api/suspendacct?api.version=1&user='+user+'&reason='+reason,
           headers: {
-            'Authorization': 'WHM '+this.setting('server_username')+':'+this.setting('server_hash')
+            'Authorization': 'WHM {{setting.server_username}}:{{setting.server_hash}}'
           },
-          type: 'GET'
+          type: 'GET',
+          secure:true
         };
-      }
+      },
     },
     events: {
       'app.activated':'doSomething',
@@ -52,7 +56,7 @@
       'click #toggle_status': 'doToggleDropDown'
     },
     doToggleDropDown: function(e){
-      console.log(this.$('#caret_server'));
+      e.preventDefault();
       switch(this.$('#caret_server')[0].className)
       {
         case "caret caret-reversed":
@@ -69,10 +73,16 @@
     doSomething: function() {
       ticket = this.ticket();
       this.switchTo('main'); 
-      var cPanel = ticket.customField('custom_field_24103102');
-      this.doSearchAccount(cPanel);
-      
-      this.doCheckServiceStatus();
+
+      // Get all the cpanel
+        var cPanelField = this.requirement('cpanel_field');
+        var cPanel = this.ticketFields('custom_field_' + cPanelField.requirement_id);
+        
+        if(cPanel){
+          this.doManualSearchAccount(cPanel);
+        }else{
+          this.doAddLogs("No cPanel account found on the ticket.");
+        }      
       
     },
     doRestartService:function(e){
@@ -92,8 +102,6 @@
       var request = this.ajax('checkServiceStatus').done(function(result){
       this.$('#status_list').empty();  
       var data = JSON.parse(result);
-      var v_icon_check = '<i class="icon-white icon-ok "></i>';
-      var v_icon_fail = '<i class="icon-repeat restart_service"></i>';
       
       var service_list = "";
       _.each(services,function(service){
@@ -102,7 +110,7 @@
         this.$('#logs').append("<p>Service " + service + " is not monitored. Please make sure it's being monitored if you want to check it's status</p>");
         }else{
           if(v_service.running == 1){
-            service_list+=('<tr class="success"><td class="service">'+service+'</td><td>Online</td><td><span class="label label-danger">Stop</span> <span class="label label-warning">Restart</span></td></tr>');
+            service_list+=('<tr class="success"><td class="service">'+service+'</td><td>Online</td><td><span class="label label-danger">Stop</span> <span class="label label-warning restart_service">Restart</span></td></tr>');
             //Success
           }else{
             //Fail3
