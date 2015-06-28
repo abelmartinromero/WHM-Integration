@@ -1,14 +1,22 @@
-<!-- modal.hdbs -->
-<div id="suspension_reason_modal" class="modal hide fade" tabindex="-1" role="dialog" aria-labelledby="myModalLabel" aria-hidden="true">
-  <div class="modal-header">
-    <button type="button" class="close" data-dismiss="modal" aria-hidden="true">×</button>
-    <h3 id="myModalLabel">Suspend User {{username}}</h3>
+<div class="modal-header">
+  <button type="button" class="close" data-dismiss="modal">×</button>
+  <h3>Link existing cPanel Account</h3>
+</div>
+
+<div class="modal-body">
+  <div class="content-body">
+  <h2>Are you sure you want to do this?</h2>
+  <br/>
+  <p>Select which comment is going to be added into the Red Alert</p>
+  <div id="radio_group">
+    {{#each comments}}
+      <input type="radio" name="comment" value="{{id}}"> {{value}}</input><br/>
+    {{/each}}
+    </div>
   </div>
-  <div class="modal-body">
-    <input type="text" id="i_susp_reason" placeholder="Type your reason here" />
-  </div>
-  <div class="modal-footer">
-    <button class="btn" data-dismiss="modal" aria-hidden="true">Cancel</button>
-    <button class="btn btn-primary" id="confirm_suspend" >Suspend</button>
-  </div>
+</div>
+
+<div class="modal-footer">
+  <button class="btn" data-dismiss="modal">No</button>
+  <button class="btn trigger_yes" data-dismiss="modal">Yes, do it!</button>
 </div>
